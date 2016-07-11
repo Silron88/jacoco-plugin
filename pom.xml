@@ -28,7 +28,7 @@ THE SOFTWARE.
    <parent>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>plugin</artifactId>
-      <version>1.609.3</version>
+      <version>1.614</version>
       <relativePath/>
    </parent>
 
@@ -78,6 +78,11 @@ THE SOFTWARE.
       <developer>
          <id>csimons</id>
          <name>Christopher Simons</name>
+      </developer>
+      <developer>
+         <id>mheinzerling</id>
+         <name>Martin Heinzerling</name>
+         <email>webmaster@mheinzerling.de</email>
       </developer>
    </developers>
 
@@ -226,8 +231,8 @@ THE SOFTWARE.
             <artifactId>maven-compiler-plugin</artifactId>
             <version>2.3.2</version>
             <configuration>
-               <source>1.6</source>
-               <target>1.6</target>
+               <source>1.7</source>
+               <target>1.7</target>
             </configuration>
          </plugin>
          <plugin>
@@ -237,7 +242,7 @@ THE SOFTWARE.
             <configuration>
                 <signature>
                   <groupId>org.codehaus.mojo.signature</groupId>
-                  <artifactId>java15</artifactId>
+                  <artifactId>java17</artifactId>
                   <version>1.0</version>
                 </signature>
             </configuration>
