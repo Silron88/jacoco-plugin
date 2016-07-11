@@ -14,13 +14,11 @@ import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Project view extension by JaCoCo plugin.
- * 
- * @author Kohsuke Kawaguchi
  */
 public final class JacocoProjectAction implements Action {
     public final Job<?,?> project;
 
-    public JacocoProjectAction(Job<?,?> project) {
+    JacocoProjectAction(Job<?,?> project) {
         this.project = project;
     }
 
@@ -39,7 +37,7 @@ public final class JacocoProjectAction implements Action {
     /**
      * Gets the most recent {@link JacocoBuildAction} object.
      */
-    public JacocoBuildAction getLastResult() {
+    private JacocoBuildAction getLastResult() {
         for (Run<?, ?> b = project.getLastBuild(); b != null; b = b.getPreviousBuild()) {
             if (b.isBuilding() || b.getResult() == Result.FAILURE || b.getResult() == Result.ABORTED)
                 continue;
@@ -54,6 +52,4 @@ public final class JacocoProjectAction implements Action {
        if (getLastResult() != null)
           getLastResult().doGraph(req,rsp);
     }
-
-    //private static final Logger logger = Logger.getLogger(JacocoBuildAction.class.getName());
 }

@@ -32,9 +32,6 @@ import hudson.util.HttpResponses;
 
 /**
  * Root object of the coverage report.
- * 
- * @author Kohsuke Kawaguchi
- * @author Ognjen Bubalo
  */
 public final class CoverageReport extends AggregatedReport<CoverageReport/*dummy*/,CoverageReport,PackageReport> {
 	private final JacocoBuildAction action;
@@ -44,19 +41,10 @@ public final class CoverageReport extends AggregatedReport<CoverageReport/*dummy
 		setName("Jacoco");
 	}
 	
-//	private String instructionColor;
-//	private String classColor;
-//	private String branchColor;
-//	private String complexityColor;
-//	private String lineColor;
-//	private String methodColor;
-	public JacocoHealthReportThresholds healthReports;
+	private JacocoHealthReportThresholds healthReports;
 
 	/**
 	 * Loads the exec files using JaCoCo API. Creates the reporting objects and the report tree.
-	 * 
-	 * @param action
-	 * @param executionFileLoader
 	 */
 	public CoverageReport(JacocoBuildAction action, ExecutionFileLoader executionFileLoader ) {
 		this(action);

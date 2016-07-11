@@ -30,23 +30,18 @@ import hudson.plugins.jacoco.model.CoverageElement.Type;
 import hudson.plugins.jacoco.model.CoverageObject;
 import hudson.plugins.jacoco.report.CoverageReport;
 
+import javax.annotation.Nullable;
+
 /**
  * Build view extension by JaCoCo plugin.
  *
  * As {@link CoverageObject}, it retains the overall coverage report.
- *
- * @author Kohsuke Kawaguchi
- * @author Jonathan Fuerth
- * @author Ognjen Bubalo
  */
 public final class JacocoBuildAction extends CoverageObject<JacocoBuildAction> implements HealthReportingAction, StaplerProxy, Serializable, RunAction2, LastBuildAction {
 
 	private transient Run<?,?> owner;
 	
-	@Deprecated public transient AbstractBuild<?,?> build;
-	
 	private final transient PrintStream logger;
-	@Deprecated private transient ArrayList<?> reports;
 	private transient WeakReference<CoverageReport> report;
 	private final String[] inclusions;
 	private final String[] exclusions;
@@ -63,10 +58,9 @@ public final class JacocoBuildAction extends CoverageObject<JacocoBuildAction> i
 	 * @param ratios
 	 *            The available coverage ratios in the report. Null is treated
 	 *            the same as an empty map.
-	 * @param thresholds
 	 */
 	public JacocoBuildAction(
-			Map<CoverageElement.Type, Coverage> ratios,
+			@Nullable Map<CoverageElement.Type, Coverage> ratios,
 			JacocoHealthReportThresholds thresholds, TaskListener listener, String[] inclusions, String[] exclusions) {
 		logger = listener.getLogger();
 		if (ratios == null) {
@@ -163,7 +157,6 @@ public final class JacocoBuildAction extends CoverageObject<JacocoBuildAction> i
 			reports.add(Messages._BuildAction_Perfect());
 		}
 		// Collect params and replace nulls with empty string
-		//throw new RuntimeException("Jebiga");
 		Object[] args = reports.toArray(new Object[5]);
 		for (int i = 4; i >= 0; i--) {
 			if (args[i]==null) {
@@ -176,7 +169,7 @@ public final class JacocoBuildAction extends CoverageObject<JacocoBuildAction> i
 				args[0], args[1], args[2], args[3], args[4]));
 	}
 
-	public JacocoHealthReportThresholds getThresholds() {
+	JacocoHealthReportThresholds getThresholds() {
 		return thresholds;
 	}
 
@@ -234,11 +227,6 @@ public final class JacocoBuildAction extends CoverageObject<JacocoBuildAction> i
 		}
 	}
 
-	@Override
-	public JacocoBuildAction getPreviousResult() {
-		return getPreviousResult(owner);
-	}
-
 	/**
 	 * @return A map which represents coverage objects and their status to show on build status page (summary.jelly).
 	 */
@@ -269,11 +257,16 @@ public final class JacocoBuildAction extends CoverageObject<JacocoBuildAction> i
 		}
 		return ratios;
 	}
+
+	@Override
+	public JacocoBuildAction getPreviousResult() {
+		return getPreviousResult(owner);
+	}
 	
 	/**
 	 * Gets the previous {@link JacocoBuildAction} of the given build.
 	 */
-	/*package*/ static JacocoBuildAction getPreviousResult(Run<?,?> start) {
+	private static JacocoBuildAction getPreviousResult(Run<?,?> start) {
 		Run<?,?> b = start;
 		while(true) {
 			b = b.getPreviousBuild();
@@ -296,28 +289,15 @@ public final class JacocoBuildAction extends CoverageObject<JacocoBuildAction> i
 	 * @throws IOException
 	 *      if failed to parse the file.
 	 */
-	public static JacocoBuildAction load(Run<?,?> owner, JacocoHealthReportThresholds thresholds, TaskListener listener, JacocoReportDir layout, String[] includes, String[] excludes) throws IOException {
-		//PrintStream logger = listener.getLogger();
-		Map<CoverageElement.Type,Coverage> ratios = null;
-		
-	    ratios = loadRatios(layout, ratios, includes, excludes);
-		return new JacocoBuildAction(ratios, thresholds, listener, includes, excludes);
+	static JacocoBuildAction load(JacocoHealthReportThresholds thresholds, TaskListener listener, JacocoReportDir layout, String[] includes, String[] excludes) throws IOException {
+		return new JacocoBuildAction(loadRatios(layout, includes, excludes), thresholds, listener, includes, excludes);
 	}
-
 
 	/**
 	 * Extracts top-level coverage information from the JaCoCo report document.
-	 * 
-	 * @param layout
-	 * @param ratios
-	 * @return
-	 * @throws IOException
 	 */
-	private static Map<Type, Coverage> loadRatios(JacocoReportDir layout, Map<Type, Coverage> ratios, String[] includes, String... excludes) throws IOException {
-
-		if (ratios == null) {
-			ratios = new LinkedHashMap<CoverageElement.Type, Coverage>();
-		}
+	private static Map<Type, Coverage> loadRatios(JacocoReportDir layout, String[] includes, String... excludes) throws IOException {
+		Map<Type, Coverage> ratios = new LinkedHashMap<CoverageElement.Type, Coverage>();
 		ExecutionFileLoader efl = layout.parse(includes, excludes);
         IBundleCoverage bundleCoverage = efl.getBundleCoverage();
 		Coverage ratio = new Coverage();
@@ -343,12 +323,10 @@ public final class JacocoBuildAction extends CoverageObject<JacocoBuildAction> i
 		ratio = new Coverage();
 		ratio.accumulatePP(bundleCoverage.getLineCounter().getMissedCount(), bundleCoverage.getLineCounter().getCoveredCount());
 		ratios.put(CoverageElement.Type.LINE, ratio);
-		//logGer.log(Level.INFO, ratios.toString());
 		return ratios;
 
 	}
 	
-	//private static final Logger logger = Logger.getLogger(JacocoBuildAction.class.getName());
 	public final PrintStream getLogger() {
 	    if(logger != null) {
 	        return logger;
