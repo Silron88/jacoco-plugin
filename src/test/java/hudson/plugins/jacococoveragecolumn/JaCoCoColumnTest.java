@@ -3,7 +3,6 @@ package hudson.plugins.jacococoveragecolumn;
 import static org.junit.Assert.*;
 import hudson.console.ConsoleNote;
 import hudson.model.BuildListener;
-import hudson.model.ItemGroup;
 import hudson.model.Result;
 import hudson.model.Cause;
 import hudson.model.Descriptor.FormException;
@@ -12,10 +11,15 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.jacoco.JacocoBuildAction;
 import hudson.plugins.jacoco.model.Coverage;
-import hudson.plugins.jacoco.model.CoverageElement;
 import hudson.plugins.jacoco.model.CoverageElement.Type;
 import hudson.search.QuickSilver;
+import hudson.util.StreamTaskListener;
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
+import org.kohsuke.stapler.export.Exported;
 
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -24,14 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-
-import javax.servlet.ServletContext;
-
-import hudson.util.StreamTaskListener;
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
-import org.kohsuke.stapler.export.Exported;
 
 public class JaCoCoColumnTest {
 
@@ -205,7 +201,7 @@ public class JaCoCoColumnTest {
 		}
 	}
 
-	private class ExternalJobExtension extends MyJob {
+	private static class ExternalJobExtension extends MyJob {
 
 	    public ExternalJobExtension(String name) {
 	        super(name);
@@ -226,8 +222,8 @@ public class JaCoCoColumnTest {
 		protected synchronized void saveNextBuildNumber() throws IOException {
 		}
 	}
-	
-	private class MyJob extends Job<MyJob,MyRun> {
+
+	static class MyJob extends Job<MyJob,MyRun> {
 
         public MyJob(String name) {
             super(null, name);
@@ -251,8 +247,8 @@ public class JaCoCoColumnTest {
             return new MyRun(this);
         }
 	}
-	
-	private class MyRun extends Run<MyJob,MyRun> {
+
+	static class MyRun extends Run<MyJob,MyRun> {
 
         public MyRun(MyJob job) throws IOException {
             super(job);
